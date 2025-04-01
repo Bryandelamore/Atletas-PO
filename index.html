@@ -8,9 +8,9 @@
         body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background-color: #f9f9f9; }
         h1 { color: #333; font-weight: bold; }
         .container { max-width: 1200px; margin: 0 auto; }
-        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); display: inline-block; }
-        input, button { margin: 5px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
+        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); display: inline-block; margin-bottom: 30px; }
+        input, button { margin: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 200px; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; width: 220px; }
         button:hover { background-color: #218838; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
@@ -20,9 +20,8 @@
         .favorito { background-color: #ffc107; }
         .ranking { background-color: #17a2b8; color: white; }
         .detalhes { color: #007bff; text-decoration: none; cursor: pointer; font-weight: bold; }
-        .logo { width: 200px; display: block; margin: 0 auto 20px; }
-        .filters { margin: 20px 0; display: flex; justify-content: center; gap: 10px; }
-        .filters input { padding: 10px; border-radius: 5px; width: 150px; }
+        .filters { margin: 20px 0; display: flex; justify-content: center; gap: 20px; }
+        .filters input { padding: 10px; border-radius: 5px; width: 220px; }
         .favorite-btn { background-color: #ffc107; color: white; cursor: pointer; border: none; }
         .favorite-btn:hover { background-color: #e0a800; }
         .card { background: #ffffff; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); padding: 20px; margin: 10px 0; }
@@ -31,16 +30,24 @@
         .card-body img { width: 100px; height: 100px; border-radius: 50%; }
         .card-body .details { flex: 1; margin-left: 15px; }
         .card-footer { text-align: center; margin-top: 10px; }
+        .card-footer button { background-color: #007bff; color: white; }
+        .card-footer button:hover { background-color: #0056b3; }
+        .detalhes-modal { display: none; background-color: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; right: 0; bottom: 0; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 600px; width: 100%; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Base de Jogadores</h1>
+
+        <!-- Filtros -->
         <div class="filters">
-            <input type="text" id="search" placeholder="Buscar por nome">
-            <input type="text" id="filterPosition" placeholder="Filtrar por Posição">
-            <input type="number" id="filterYear" placeholder="Ano de Nascimento">
+            <input type="text" id="search" placeholder="Buscar por nome" oninput="filterPlayers()">
+            <input type="text" id="filterPosition" placeholder="Filtrar por Posição" oninput="filterPlayers()">
+            <input type="number" id="filterYear" placeholder="Ano de Nascimento" oninput="filterPlayers()">
         </div>
+
+        <!-- Formulário de Cadastro -->
         <form id="playerForm">
             <input type="text" id="name" placeholder="Nome" required>
             <input type="text" id="position" placeholder="Posição" required>
@@ -52,8 +59,18 @@
             <button type="submit">Adicionar Jogador</button>
         </form>
 
+        <!-- Lista de Jogadores -->
         <div id="playerList">
             <!-- Cards de Jogadores serão gerados aqui -->
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div id="detailsModal" class="detalhes-modal">
+        <div class="modal-content">
+            <h2>Detalhes do Jogador</h2>
+            <div id="modalDetails"></div>
+            <button onclick="closeModal()">Fechar</button>
         </div>
     </div>
 
@@ -61,7 +78,10 @@
         document.addEventListener("DOMContentLoaded", function () {
             const playerForm = document.getElementById("playerForm");
             const playerList = document.getElementById("playerList");
+            const detailsModal = document.getElementById("detailsModal");
+            const modalDetails = document.getElementById("modalDetails");
 
+            // Função para carregar os jogadores
             function loadPlayers() {
                 const players = JSON.parse(localStorage.getItem("players")) || [];
                 playerList.innerHTML = "";
@@ -70,10 +90,12 @@
                 });
             }
 
+            // Função para salvar os jogadores no localStorage
             function savePlayers(players) {
                 localStorage.setItem("players", JSON.stringify(players));
             }
 
+            // Adicionar jogador na lista com card
             function addPlayerToCard(player, index) {
                 let card = document.createElement("div");
                 card.classList.add("card");
@@ -104,7 +126,6 @@
                 cardFooter.classList.add("card-footer");
                 let detailsButton = document.createElement("button");
                 detailsButton.innerText = "Ver Detalhes";
-                detailsButton.classList.add("detalhes");
                 detailsButton.onclick = function () {
                     viewPlayerDetails(player);
                 };
@@ -115,10 +136,26 @@
                 playerList.appendChild(card);
             }
 
+            // Exibir detalhes do jogador em um modal
             function viewPlayerDetails(player) {
-                alert(`Detalhes do Jogador: ${player.name}\nPosição: ${player.position}\nContato: ${player.contact}`);
+                modalDetails.innerHTML = `
+                    <p><strong>Nome:</strong> ${player.name}</p>
+                    <p><strong>Posição:</strong> ${player.position}</p>
+                    <p><strong>Responsável:</strong> ${player.guardian}</p>
+                    <p><strong>Contato:</strong> ${player.contact}</p>
+                    <p><strong>Histórico:</strong> ${player.history}</p>
+                    <p><strong>Data de Nascimento:</strong> ${player.dob}</p>
+                    <p><strong>Documento:</strong> <a href="${player.document}" target="_blank">Baixar Documento</a></p>
+                `;
+                detailsModal.style.display = "flex";
             }
 
+            // Fechar o modal
+            function closeModal() {
+                detailsModal.style.display = "none";
+            }
+
+            // Função de filtro
             function filterPlayers() {
                 let players = JSON.parse(localStorage.getItem("players")) || [];
                 let searchQuery = document.getElementById("search").value.toLowerCase();
@@ -137,6 +174,7 @@
                 });
             }
 
+            // Adiciona jogador no armazenamento local
             playerForm.addEventListener("submit", function (event) {
                 event.preventDefault();
                 let name = document.getElementById("name").value;
@@ -160,12 +198,9 @@
                 playerForm.reset();
             });
 
-            document.getElementById("search").addEventListener("input", filterPlayers);
-            document.getElementById("filterPosition").addEventListener("input", filterPlayers);
-            document.getElementById("filterYear").addEventListener("input", filterPlayers);
-
             loadPlayers();
         });
     </script>
 </body>
 </html>
+
