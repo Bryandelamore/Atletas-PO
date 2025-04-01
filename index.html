@@ -5,34 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Base de Jogadores</title>
     <style>
+        /* Definindo um layout moderno */
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Arial', sans-serif; 
             text-align: center; 
             margin: 20px; 
-            background-color: #f4f4f4;
-            background-image: url('images/futebol-background.jpg'); /* Imagem de fundo com tema de futebol */
+            background: url('images/futebol-textura.jpg') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            filter: brightness(0.7); /* Reduz a luminosidade para não interferir no conteúdo */
+            filter: brightness(0.8); /* Reduz a luminosidade */
+            color: #fff;
         }
-        h1 { color: #333; }
-        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); display: inline-block; }
-        input, button { margin: 5px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { background-color: #66cdaa; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #4caf50; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background-color: #66cdaa; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        tr:hover { background-color: #ddd; }
-        @media (max-width: 600px) {
-            table, form { width: 100%; }
-            input { width: 90%; }
+        h1 { 
+            font-weight: bold; 
+            color: #fff; 
+            text-transform: uppercase; 
+            font-size: 2rem; 
+            margin-bottom: 20px;
+        }
+        form { 
+            background: rgba(255, 255, 255, 0.8); 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); 
+            display: inline-block; 
+            width: 100%;
+            max-width: 600px;
+        }
+        input, button, select {
+            margin: 10px; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px;
+            font-weight: bold;
+            width: calc(100% - 24px);
+        }
+        button { 
+            background-color: #66cdaa; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
+        button:hover { 
+            background-color: #4caf50; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 30px; 
+            background: rgba(255, 255, 255, 0.8); 
+            border-radius: 8px; 
+            overflow: hidden; 
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px; 
+            text-align: center; 
+            font-weight: bold; 
+        }
+        th { 
+            background-color: #66cdaa; 
+            color: white; 
+        }
+        tr:nth-child(even) { 
+            background-color: #f2f2f2; 
+        }
+        tr:hover { 
+            background-color: #ddd; 
+        }
+        /* Filtros */
+        .filters {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .filters select, .filters input {
+            width: 200px;
+            margin: 5px;
+        }
+        .filters button {
+            width: auto;
+            padding: 12px 20px;
+            background-color: #66cdaa;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <h1>Base de Jogadores Peneira Online </h1>
+    <h1>Base de Jogadores</h1>
+
+    <!-- Filtros -->
+    <div class="filters">
+        <label for="filterPosition">Filtrar por Posição:</label>
+        <select id="filterPosition">
+            <option value="">Selecione a Posição</option>
+            <option value="Atacante">Atacante</option>
+            <option value="Meio-campo">Meio-campo</option>
+            <option value="Zagueiro">Zagueiro</option>
+            <option value="Goleiro">Goleiro</option>
+        </select>
+
+        <label for="filterDOB">Filtrar por Data de Nascimento:</label>
+        <input type="date" id="filterDOB">
+
+        <button id="filterButton">Filtrar</button>
+    </div>
+
+    <!-- Formulário de Cadastro -->
     <form id="playerForm">
         <input type="text" id="name" placeholder="Nome" required>
         <input type="text" id="position" placeholder="Posição" required>
@@ -43,6 +125,8 @@
         <input type="file" id="document" accept=".pdf,.jpg,.png">
         <button type="submit">Adicionar Jogador</button>
     </form>
+
+    <!-- Tabela de Jogadores -->
     <table>
         <thead>
             <tr>
@@ -58,10 +142,14 @@
         </thead>
         <tbody id="playerList"></tbody>
     </table>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const playerForm = document.getElementById("playerForm");
             const playerList = document.getElementById("playerList");
+            const filterButton = document.getElementById("filterButton");
+            const filterPosition = document.getElementById("filterPosition");
+            const filterDOB = document.getElementById("filterDOB");
 
             function loadPlayers() {
                 const players = JSON.parse(localStorage.getItem("players")) || [];
@@ -114,6 +202,20 @@
                 loadPlayers();
             }
 
+            // Filtros
+            filterButton.addEventListener("click", function () {
+                const players = JSON.parse(localStorage.getItem("players")) || [];
+                const filteredPlayers = players.filter(player => {
+                    const matchesPosition = filterPosition.value ? player.position === filterPosition.value : true;
+                    const matchesDOB = filterDOB.value ? player.dob === filterDOB.value : true;
+                    return matchesPosition && matchesDOB;
+                });
+                playerList.innerHTML = "";
+                filteredPlayers.forEach((player, index) => {
+                    addPlayerToTable(player, index);
+                });
+            });
+
             playerForm.addEventListener("submit", function (event) {
                 event.preventDefault();
                 let name = document.getElementById("name").value;
@@ -142,7 +244,5 @@
     </script>
 </body>
 </html>
-
-        
 
 
