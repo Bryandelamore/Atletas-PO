@@ -5,63 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Base de Jogadores</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: black; }
-        h1 { font-weight: bold; color: #4CAF50; }
-        form { padding: 20px; border: 1px solid #ccc; margin-bottom: 20px; background-color: white; }
-        input, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; color: black; }
-        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #45a049; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: center; border: 1px solid #ddd; color: black; }
-        th { background-color: #4CAF50; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        tr:hover { background-color: #ddd; }
-        input, select { color: black; background-color: white; }
+        /* Resetando margens e padding padrão */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        /* Formulário */
+        form {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            color: black;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            color: black;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        /* Ajustes responsivos */
+        @media (max-width: 600px) {
+            table,
+            form {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <h1>Base de Jogadores</h1>
+    <div class="container">
+        <h1>Base de Jogadores</h1>
 
-    <!-- Formulário de Cadastro -->
-    <form action="/add" method="POST">
-        <input type="text" name="name" placeholder="Nome" required><br>
-        <input type="text" name="position" placeholder="Posição" required><br>
-        <input type="text" name="guardian" placeholder="Nome do Responsável" required><br>
-        <input type="tel" name="contact" placeholder="Contato" required><br>
-        <input type="date" name="dob" required><br>
-        <input type="text" name="history" placeholder="Histórico dos Clubes" required><br>
-        <input type="file" name="document" accept=".pdf,.jpg,.png"><br>
-        <button type="submit">Adicionar Jogador</button>
-    </form>
+        <!-- Formulário de Cadastro -->
+        <form action="/add" method="POST">
+            <input type="text" name="name" placeholder="Nome" required><br>
+            <input type="text" name="position" placeholder="Posição" required><br>
+            <input type="text" name="guardian" placeholder="Nome do Responsável" required><br>
+            <input type="tel" name="contact" placeholder="Contato" required><br>
+            <input type="date" name="dob" required><br>
+            <input type="text" name="history" placeholder="Histórico dos Clubes" required><br>
+            <input type="file" name="document" accept=".pdf,.jpg,.png"><br>
+            <button type="submit">Adicionar Jogador</button>
+        </form>
 
-    <!-- Exibir os Jogadores -->
-    <table>
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Posição</th>
-                <th>Responsável</th>
-                <th>Contato</th>
-                <th>Data de Nascimento</th>
-                <th>Histórico</th>
-                <th>Documento</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for player in players %}
+        <!-- Exibir os Jogadores -->
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ player.name }}</td>
-                    <td>{{ player.position }}</td>
-                    <td>{{ player.guardian }}</td>
-                    <td>{{ player.contact }}</td>
-                    <td>{{ player.dob }}</td>
-                    <td>{{ player.history }}</td>
-                    <td><a href="{{ player.document }}" target="_blank">Baixar Documento</a></td>
+                    <th>Nome</th>
+                    <th>Posição</th>
+                    <th>Responsável</th>
+                    <th>Contato</th>
+                    <th>Data de Nascimento</th>
+                    <th>Histórico</th>
+                    <th>Documento</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                    <tr>
+                        <td>{{ player.name }}</td>
+                        <td>{{ player.position }}</td>
+                        <td>{{ player.guardian }}</td>
+                        <td>{{ player.contact }}</td>
+                        <td>{{ player.dob }}</td>
+                        <td>{{ player.history }}</td>
+                        <td><a href="{{ player.document }}" target="_blank">Baixar Documento</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 </body>
 </html>
