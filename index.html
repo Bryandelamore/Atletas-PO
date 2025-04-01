@@ -5,26 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Base de Jogadores</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background-color: #f4f4f4; }
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 20px; 
+            background-color: #f4f4f4;
+            background-image: url('images/futebol-background.jpg'); /* Imagem de fundo com tema de futebol */
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.7); /* Reduz a luminosidade para não interferir no conteúdo */
+        }
         h1 { color: #333; }
         form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); display: inline-block; }
         input, button { margin: 5px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { background-color: #90ee90; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #66cc66; }
+        button { background-color: #66cdaa; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #4caf50; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background-color: #90ee90; color: white; }
+        th { background-color: #66cdaa; color: white; }
         tr:nth-child(even) { background-color: #f2f2f2; }
         tr:hover { background-color: #ddd; }
         @media (max-width: 600px) {
             table, form { width: 100%; }
             input { width: 90%; }
         }
-        .logo { width: 200px; display: block; margin: 0 auto 20px; }
     </style>
 </head>
 <body>
-    <img src="Logo-peneira-online.png" alt="Logo" class="logo">
     <h1>Base de Jogadores</h1>
     <form id="playerForm">
         <input type="text" id="name" placeholder="Nome" required>
@@ -135,5 +142,7 @@
     </script>
 </body>
 </html>
+
+        
 
 
