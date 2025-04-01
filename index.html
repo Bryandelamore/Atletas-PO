@@ -5,12 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Base de Jogadores</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid black; padding: 10px; }
-        th { background-color: #f2f2f2; }
-        form { margin-top: 20px; }
-        button { cursor: pointer; }
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background-color: #f4f4f4; }
+        h1 { color: #333; }
+        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); display: inline-block; }
+        input, button { margin: 5px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        tr:hover { background-color: #ddd; }
+        @media (max-width: 600px) {
+            table, form { width: 100%; }
+            input { width: 90%; }
+        }
     </style>
 </head>
 <body>
@@ -20,7 +29,7 @@
         <input type="text" id="position" placeholder="Posição" required>
         <input type="text" id="guardian" placeholder="Nome do Responsável" required>
         <input type="tel" id="contact" placeholder="Contato" required>
-        <input type="date" id="dob" placeholder="Data de Nascimento" required>
+        <input type="date" id="dob" required>
         <input type="text" id="history" placeholder="Histórico dos Clubes" required>
         <input type="file" id="document" accept=".pdf,.jpg,.png">
         <button type="submit">Adicionar Jogador</button>
@@ -69,7 +78,8 @@
                 if (player.document) {
                     let docLink = document.createElement("a");
                     docLink.href = player.document;
-                    docLink.innerText = "Ver Documento";
+                    docLink.innerText = "Baixar Documento";
+                    docLink.download = player.documentName;
                     docLink.target = "_blank";
                     docCell.appendChild(docLink);
                 } else {
@@ -78,6 +88,10 @@
                 let deleteCell = row.insertCell(7);
                 let deleteButton = document.createElement("button");
                 deleteButton.innerText = "Remover";
+                deleteButton.style.backgroundColor = "#dc3545";
+                deleteButton.style.color = "white";
+                deleteButton.style.border = "none";
+                deleteButton.style.cursor = "pointer";
                 deleteButton.onclick = function () {
                     removePlayer(index);
                 };
@@ -101,12 +115,14 @@
                 let history = document.getElementById("history").value;
                 let documentInput = document.getElementById("document");
                 let documentUrl = "";
+                let documentName = "";
                 if (documentInput.files.length > 0) {
                     let file = documentInput.files[0];
                     documentUrl = URL.createObjectURL(file);
+                    documentName = file.name;
                 }
                 let players = JSON.parse(localStorage.getItem("players")) || [];
-                players.push({ name, position, guardian, contact, dob, history, document: documentUrl });
+                players.push({ name, position, guardian, contact, dob, history, document: documentUrl, documentName });
                 savePlayers(players);
                 loadPlayers();
                 playerForm.reset();
@@ -117,13 +133,3 @@
     </script>
 </body>
 </html>
-
-     
-
-
-         
-            
-         
-
-                
-         
