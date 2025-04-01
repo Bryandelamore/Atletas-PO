@@ -104,3 +104,126 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Base de Jogadores</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid black; padding: 10px; }
+        th { background-color: #f2f2f2; }
+        form { margin-top: 20px; }
+        button { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Base de Jogadores</h1>
+    <form id="playerForm">
+        <input type="text" id="name" placeholder="Nome" required>
+        <input type="number" id="age" placeholder="Idade" required>
+        <input type="text" id="position" placeholder="Posição" required>
+        <input type="text" id="guardian" placeholder="Nome do Responsável" required>
+        <input type="tel" id="contact" placeholder="Contato" required>
+        <input type="date" id="dob" placeholder="Data de Nascimento" required>
+        <input type="text" id="history" placeholder="Histórico dos Clubes" required>
+        <input type="file" id="document" accept=".pdf,.jpg,.png">
+        <button type="submit">Adicionar Jogador</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Idade</th>
+                <th>Posição</th>
+                <th>Responsável</th>
+                <th>Contato</th>
+                <th>Data de Nascimento</th>
+                <th>Histórico</th>
+                <th>Documento</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="playerList"></tbody>
+    </table>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const playerForm = document.getElementById("playerForm");
+            const playerList = document.getElementById("playerList");
+
+            function loadPlayers() {
+                const players = JSON.parse(localStorage.getItem("players")) || [];
+                playerList.innerHTML = "";
+                players.forEach((player, index) => {
+                    addPlayerToTable(player, index);
+                });
+            }
+
+            function savePlayers(players) {
+                localStorage.setItem("players", JSON.stringify(players));
+            }
+
+            function addPlayerToTable(player, index) {
+                let row = playerList.insertRow();
+                row.insertCell(0).innerText = player.name;
+                row.insertCell(1).innerText = player.age;
+                row.insertCell(2).innerText = player.position;
+                row.insertCell(3).innerText = player.guardian;
+                row.insertCell(4).innerText = player.contact;
+                row.insertCell(5).innerText = player.dob;
+                row.insertCell(6).innerText = player.history;
+                let docCell = row.insertCell(7);
+                if (player.document) {
+                    let docLink = document.createElement("a");
+                    docLink.href = player.document;
+                    docLink.innerText = "Ver Documento";
+                    docLink.target = "_blank";
+                    docCell.appendChild(docLink);
+                } else {
+                    docCell.innerText = "Nenhum";
+                }
+                let deleteCell = row.insertCell(8);
+                let deleteButton = document.createElement("button");
+                deleteButton.innerText = "Remover";
+                deleteButton.onclick = function () {
+                    removePlayer(index);
+                };
+                deleteCell.appendChild(deleteButton);
+            }
+
+            function removePlayer(index) {
+                let players = JSON.parse(localStorage.getItem("players")) || [];
+                players.splice(index, 1);
+                savePlayers(players);
+                loadPlayers();
+            }
+
+            playerForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+                let name = document.getElementById("name").value;
+                let age = document.getElementById("age").value;
+                let position = document.getElementById("position").value;
+                let guardian = document.getElementById("guardian").value;
+                let contact = document.getElementById("contact").value;
+                let dob = document.getElementById("dob").value;
+                let history = document.getElementById("history").value;
+                let documentInput = document.getElementById("document");
+                let documentUrl = "";
+                if (documentInput.files.length > 0) {
+                    let file = documentInput.files[0];
+                    documentUrl = URL.createObjectURL(file);
+                }
+                let players = JSON.parse(localStorage.getItem("players")) || [];
+                players.push({ name, age, position, guardian, contact, dob, history, document: documentUrl });
+                savePlayers(players);
+                loadPlayers();
+                playerForm.reset();
+            });
+
+            loadPlayers();
+        });
+    </script>
+</body>
+</html>
