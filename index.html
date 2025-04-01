@@ -18,14 +18,14 @@
             color: black;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             height: 100vh;
             margin: 0;
         }
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px;
             background-color: white;
             padding: 20px;
             border-radius: 10px;
@@ -45,6 +45,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            width: 100%;
         }
 
         input,
@@ -54,6 +55,7 @@
             border-radius: 5px;
             border: 1px solid #ccc;
             color: black;
+            width: 100%;
         }
 
         button {
@@ -65,6 +67,18 @@
 
         button:hover {
             background-color: #45a049;
+        }
+
+        /* Estilo dos botões de filtro e excluir */
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .filter-container input,
+        .filter-container button {
+            width: 48%;
         }
 
         /* Tabela */
@@ -121,6 +135,13 @@
             <button type="submit">Adicionar Jogador</button>
         </form>
 
+        <!-- Filtro de Posição e Data -->
+        <div class="filter-container">
+            <input type="text" id="positionFilter" placeholder="Filtrar por Posição" />
+            <input type="date" id="dobFilter" />
+            <button id="filterButton">Filtrar</button>
+        </div>
+
         <!-- Exibir os Jogadores -->
         <table>
             <thead>
@@ -132,26 +153,97 @@
                     <th>Data de Nascimento</th>
                     <th>Histórico</th>
                     <th>Documento</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for player in players %}
-                    <tr>
-                        <td>{{ player.name }}</td>
-                        <td>{{ player.position }}</td>
-                        <td>{{ player.guardian }}</td>
-                        <td>{{ player.contact }}</td>
-                        <td>{{ player.dob }}</td>
-                        <td>{{ player.history }}</td>
-                        <td><a href="{{ player.document }}" target="_blank">Baixar Documento</a></td>
-                    </tr>
-                {% endfor %}
+            <tbody id="playerList">
+                <!-- Dados serão inseridos aqui -->
             </tbody>
         </table>
     </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const playerList = document.getElementById("playerList");
+            const filterButton = document.getElementById("filterButton");
+            const positionFilter = document.getElementById("positionFilter");
+            const dobFilter = document.getElementById("dobFilter");
+
+            function loadPlayers() {
+                const players = JSON.parse(localStorage.getItem("players")) || [];
+                playerList.innerHTML = ""; // Limpa a lista antes de carregar
+                players.forEach((player, index) => {
+                    addPlayerToTable(player, index);
+                });
+            }
+
+            function savePlayers(players) {
+                localStorage.setItem("players", JSON.stringify(players));
+            }
+
+            function addPlayerToTable(player, index) {
+                let row = playerList.insertRow();
+                row.insertCell(0).innerText = player.name;
+                row.insertCell(1).innerText = player.position;
+                row.insertCell(2).innerText = player.guardian;
+                row.insertCell(3).innerText = player.contact;
+                row.insertCell(4).innerText = player.dob;
+                row.insertCell(5).innerText = player.history;
+                let docCell = row.insertCell(6);
+                if (player.document) {
+                    let docLink = document.createElement("a");
+                    docLink.href = player.document;
+                    docLink.innerText = "Baixar Documento";
+                    docLink.download = player.documentName;
+                    docLink.target = "_blank";
+                    docCell.appendChild(docLink);
+                } else {
+                    docCell.innerText = "Nenhum";
+                }
+                let deleteCell = row.insertCell(7);
+                let deleteButton = document.createElement("button");
+                deleteButton.innerText = "Remover";
+                deleteButton.style.backgroundColor = "#dc3545";
+                deleteButton.style.color = "white";
+                deleteButton.style.border = "none";
+                deleteButton.style.cursor = "pointer";
+                deleteButton.onclick = function () {
+                    removePlayer(index);
+                };
+                deleteCell.appendChild(deleteButton);
+            }
+
+            function removePlayer(index) {
+                let players = JSON.parse(localStorage.getItem("players")) || [];
+                players.splice(index, 1);
+                savePlayers(players);
+                loadPlayers();
+            }
+
+            filterButton.addEventListener("click", function () {
+                const position = positionFilter.value.toLowerCase();
+                const dob = dobFilter.value;
+                const players = JSON.parse(localStorage.getItem("players")) || [];
+
+                const filteredPlayers = players.filter(player => {
+                    return (
+                        (position === "" || player.position.toLowerCase().includes(position)) &&
+                        (dob === "" || player.dob === dob)
+                    );
+                });
+
+                playerList.innerHTML = ""; // Limpa a lista antes de adicionar os filtrados
+                filteredPlayers.forEach((player, index) => {
+                    addPlayerToTable(player, index);
+                });
+            });
+
+            loadPlayers();
+        });
+    </script>
 </body>
 </html>
+
 
 
 
