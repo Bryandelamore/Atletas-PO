@@ -135,10 +135,10 @@
             <button type="submit">Adicionar Jogador</button>
         </form>
 
-        <!-- Filtro de Posição e Data -->
+        <!-- Filtro de Posição e Ano de Nascimento -->
         <div class="filter-container">
             <input type="text" id="positionFilter" placeholder="Filtrar por Posição" />
-            <input type="date" id="dobFilter" />
+            <input type="number" id="yearFilter" placeholder="Filtrar por Ano de Nascimento" min="1900" max="2099" step="1" />
             <button id="filterButton">Filtrar</button>
         </div>
 
@@ -167,7 +167,7 @@
             const playerList = document.getElementById("playerList");
             const filterButton = document.getElementById("filterButton");
             const positionFilter = document.getElementById("positionFilter");
-            const dobFilter = document.getElementById("dobFilter");
+            const yearFilter = document.getElementById("yearFilter");
             const playerForm = document.getElementById("playerForm");
 
             // Função para carregar os jogadores do localStorage
@@ -257,13 +257,14 @@
             // Evento para aplicar os filtros
             filterButton.addEventListener("click", function () {
                 const position = positionFilter.value.toLowerCase();
-                const dob = dobFilter.value;
+                const year = yearFilter.value;
                 const players = JSON.parse(localStorage.getItem("players")) || [];
 
                 const filteredPlayers = players.filter(player => {
+                    const playerYear = new Date(player.dob).getFullYear();
                     return (
                         (position === "" || player.position.toLowerCase().includes(position)) &&
-                        (dob === "" || player.dob === dob)
+                        (year === "" || playerYear == year)
                     );
                 });
 
