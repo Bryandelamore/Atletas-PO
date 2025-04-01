@@ -10,48 +10,6 @@
     <p>Aqui você pode visualizar e gerenciar os atletas cadastrados.</p>
 </body>
 </html>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid black; padding: 10px; }
-        th { background-color: #f2f2f2; }
-        form { margin-top: 20px; }
-    </style>
-</head>
-<body>
-    <h1>Base de Jogadores</h1>
-    <form id="playerForm">
-        <input type="text" id="name" placeholder="Nome" required>
-        <input type="number" id="age" placeholder="Idade" required>
-        <input type="text" id="position" placeholder="Posição" required>
-        <button type="submit">Adicionar Jogador</button>
-    </form>
-    <table>
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Idade</th>
-                <th>Posição</th>
-            </tr>
-        </thead>
-        <tbody id="playerList"></tbody>
-    </table>
-    <script>
-        document.getElementById("playerForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            let name = document.getElementById("name").value;
-            let age = document.getElementById("age").value;
-            let position = document.getElementById("position").value;
-            let table = document.getElementById("playerList");
-            let row = table.insertRow();
-            row.insertCell(0).innerText = name;
-            row.insertCell(1).innerText = age;
-            row.insertCell(2).innerText = position;
-            document.getElementById("playerForm").reset();
-        });
-    </script>
-</body>
-</html>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -91,18 +49,21 @@
             const playerForm = document.getElementById("playerForm");
             const playerList = document.getElementById("playerList");
 
+            // Carrega os jogadores do localStorage
             function loadPlayers() {
                 const players = JSON.parse(localStorage.getItem("players")) || [];
-                playerList.innerHTML = "";
+                playerList.innerHTML = ""; // Limpa a lista para atualização
                 players.forEach((player, index) => {
                     addPlayerToTable(player.name, player.age, player.position, index);
                 });
             }
 
+            // Salva os jogadores no localStorage
             function savePlayers(players) {
                 localStorage.setItem("players", JSON.stringify(players));
             }
 
+            // Adiciona jogador à tabela
             function addPlayerToTable(name, age, position, index) {
                 let row = playerList.insertRow();
                 row.insertCell(0).innerText = name;
@@ -117,6 +78,7 @@
                 deleteCell.appendChild(deleteButton);
             }
 
+            // Remove um jogador
             function removePlayer(index) {
                 let players = JSON.parse(localStorage.getItem("players")) || [];
                 players.splice(index, 1);
@@ -124,6 +86,7 @@
                 loadPlayers();
             }
 
+            // Adiciona um jogador ao formulário
             playerForm.addEventListener("submit", function (event) {
                 event.preventDefault();
                 let name = document.getElementById("name").value;
@@ -132,11 +95,11 @@
                 let players = JSON.parse(localStorage.getItem("players")) || [];
                 players.push({ name, age, position });
                 savePlayers(players);
-                loadPlayers();
-                playerForm.reset();
+                loadPlayers(); // Atualiza a tabela
+                playerForm.reset(); // Limpa o formulário
             });
 
-            loadPlayers();
+            loadPlayers(); // Carrega os jogadores ao iniciar a página
         });
     </script>
 </body>
