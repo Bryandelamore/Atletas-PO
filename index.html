@@ -53,8 +53,10 @@
             const playerForm = document.getElementById("playerForm");
             const playerList = document.getElementById("playerList");
 
-            function loadPlayers() {
-                const players = JSON.parse(localStorage.getItem("players")) || [];
+            function loadPlayers(players = null) {
+                if (!players) {
+                    players = JSON.parse(localStorage.getItem("players")) || [];
+                }
                 playerList.innerHTML = "";
                 players.forEach((player, index) => {
                     playerList.innerHTML += `
@@ -82,28 +84,15 @@
                 let searchQuery = document.getElementById("search").value.toLowerCase();
                 let filterPosition = document.getElementById("filterPosition").value.toLowerCase();
                 let filterYear = document.getElementById("filterYear").value;
-                playerList.innerHTML = "";
-                players.forEach((player, index) => {
-                    if (
-                        (player.name.toLowerCase().includes(searchQuery) || !searchQuery) &&
-                        (player.position.toLowerCase().includes(filterPosition) || !filterPosition) &&
-                        (player.dob.includes(filterYear) || !filterYear)
-                    ) {
-                        playerList.innerHTML += `
-                            <tr>
-                                <td>${player.guardian}</td>
-                                <td>${player.contact}</td>
-                                <td>${player.name}</td>
-                                <td>${player.dob}</td>
-                                <td>${player.position}</td>
-                                <td><a href="${player.document}" target="_blank" class="btn btn-secondary btn-sm">Ver Doc</a></td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" onclick="editPlayer(${index})">Editar</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
-                                </td>
-                            </tr>`;
-                    }
+                
+                let filteredPlayers = players.filter(player => {
+                    return (
+                        (!searchQuery || player.name.toLowerCase().includes(searchQuery)) &&
+                        (!filterPosition || player.position.toLowerCase().includes(filterPosition)) &&
+                        (!filterYear || player.dob.includes(filterYear))
+                    );
                 });
+                loadPlayers(filteredPlayers);
             }
 
             playerForm.addEventListener("submit", function (event) {
@@ -154,4 +143,5 @@
     </script>
 </body>
 </html>
+
 
