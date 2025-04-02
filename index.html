@@ -105,28 +105,51 @@
 
             filterButton.addEventListener("click", filterPlayers);
 
-            playerForm.addEventListener("submit", function (event) {
-                event.preventDefault();
-                let players = JSON.parse(localStorage.getItem("players")) || [];
-                let documentInput = document.getElementById("document");
-                let documentUrl = "";
-                if (documentInput.files.length > 0) {
-                    let file = documentInput.files[0];
-                    documentUrl = URL.createObjectURL(file);
-                }
-                const newPlayer = {
-                    name: document.getElementById("name").value,
-                    position: document.getElementById("position").value,
-                    guardian: document.getElementById("guardian").value,
-                    contact: document.getElementById("contact").value,
-                    dob: document.getElementById("dob").value,
-                    document: documentUrl
-                };
-                players.push(newPlayer);
-                savePlayers(players);
-                loadPlayers();
-                playerForm.reset();
+            document.getElementById("playerForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    
+    let documentInput = document.getElementById("document");
+    let documentUrl = "";
+    
+    if (documentInput.files.length > 0) {
+        let file = documentInput.files[0];
+        let formData = new FormData();
+        formData.append("file", file);
+        formData.append(dpy5fezpf, 483485417816251); // Configurar no Cloudinary
+        
+        try {
+            let response = await fetch("https://api.cloudinary.com/v1_1/SEU_CLOUD_NAME/upload", {
+                method: "POST",
+                body: formData
             });
+            let data = await response.json();
+            documentUrl = data.secure_url; // Link do arquivo armazenado no Cloudinary
+        } catch (error) {
+            console.error("Erro ao enviar arquivo:", error);
+            alert("Erro ao enviar o documento!");
+            return;
+        }
+    }
+
+    const newPlayer = {
+        name: document.getElementById("name").value,
+        position: document.getElementById("position").value,
+        guardian: document.getElementById("guardian").value,
+        contact: document.getElementById("contact").value,
+        dob: document.getElementById("dob").value,
+        document: documentUrl
+    };
+
+    // Aqui você pode salvar no Firebase Firestore ou localStorage
+    let players = JSON.parse(localStorage.getItem("players")) || [];
+    players.push(newPlayer);
+    localStorage.setItem("players", JSON.stringify(players));
+
+    alert("Jogador cadastrado com sucesso!");
+    document.getElementById("playerForm").reset();
+    loadPlayers();
+});
+
             loadPlayers();
         });
     </script>
