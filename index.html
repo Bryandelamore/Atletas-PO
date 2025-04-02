@@ -87,9 +87,9 @@
                 
                 let filteredPlayers = players.filter(player => {
                     return (
-                        (!searchQuery || player.name.toLowerCase().includes(searchQuery)) ||
-                        (!filterPosition || player.position.toLowerCase().includes(filterPosition)) ||
-                        (!filterYear || player.dob.includes(filterYear))
+                        (searchQuery === "" || player.name.toLowerCase().includes(searchQuery)) &&
+                        (filterPosition === "" || player.position.toLowerCase().includes(filterPosition)) &&
+                        (filterYear === "" || player.dob.includes(filterYear))
                     );
                 });
                 loadPlayers(filteredPlayers);
@@ -143,5 +143,3 @@
     </script>
 </body>
 </html>
-
-
