@@ -9,7 +9,6 @@
     <style>
         body { background-color: #f9f9f9; }
         .container { max-width: 900px; margin: 20px auto; }
-        .card img { width: 50px; height: 50px; border-radius: 50%; }
     </style>
 </head>
 <body>
@@ -17,9 +16,10 @@
         <h1 class="text-center my-4">Base de Jogadores</h1>
         
         <div class="row mb-3">
-            <div class="col-md-6"><input type="text" id="search" class="form-control" placeholder="Buscar por nome" oninput="filterPlayers()"></div>
-            <div class="col-md-3"><input type="text" id="filterPosition" class="form-control" placeholder="Filtrar por posição" oninput="filterPlayers()"></div>
-            <div class="col-md-3"><input type="number" id="filterYear" class="form-control" placeholder="Ano de nascimento" oninput="filterPlayers()"></div>
+            <div class="col-md-4"><input type="text" id="search" class="form-control" placeholder="Buscar por nome"></div>
+            <div class="col-md-3"><input type="text" id="filterPosition" class="form-control" placeholder="Filtrar por posição"></div>
+            <div class="col-md-3"><input type="number" id="filterYear" class="form-control" placeholder="Ano de nascimento"></div>
+            <div class="col-md-2"><button class="btn btn-primary w-100" onclick="filterPlayers()">Buscar</button></div>
         </div>
         
         <form id="playerForm" class="bg-white p-4 shadow rounded">
@@ -32,7 +32,20 @@
             <button type="submit" class="btn btn-success w-100">Adicionar Jogador</button>
         </form>
         
-        <div id="playerList" class="mt-4"></div>
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>Nome do Responsável</th>
+                    <th>Contato</th>
+                    <th>Nome do Atleta</th>
+                    <th>Data de Nascimento</th>
+                    <th>Posição</th>
+                    <th>Documento</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="playerList"></tbody>
+        </table>
     </div>
     
     <script>
@@ -45,15 +58,18 @@
                 playerList.innerHTML = "";
                 players.forEach((player, index) => {
                     playerList.innerHTML += `
-                        <div class="d-flex align-items-center border p-2 mb-2 bg-white shadow-sm">
-                            <img src="https://via.placeholder.com/50" alt="Jogador">
-                            <div class="ms-3 flex-grow-1">
-                                <strong>${player.name}</strong> - ${player.position} | ${player.dob.split('-')[0]}
-                            </div>
-                            <a href="${player.document}" target="_blank" class="btn btn-secondary btn-sm me-2">Ver Doc</a>
-                            <button class="btn btn-primary btn-sm me-2" onclick="editPlayer(${index})">Editar</button>
-                            <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
-                        </div>`;
+                        <tr>
+                            <td>${player.guardian}</td>
+                            <td>${player.contact}</td>
+                            <td>${player.name}</td>
+                            <td>${player.dob}</td>
+                            <td>${player.position}</td>
+                            <td><a href="${player.document}" target="_blank" class="btn btn-secondary btn-sm">Ver Doc</a></td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="editPlayer(${index})">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
+                            </td>
+                        </tr>`;
                 });
             }
 
@@ -74,15 +90,18 @@
                         (player.dob.includes(filterYear) || !filterYear)
                     ) {
                         playerList.innerHTML += `
-                            <div class="d-flex align-items-center border p-2 mb-2 bg-white shadow-sm">
-                                <img src="https://via.placeholder.com/50" alt="Jogador">
-                                <div class="ms-3 flex-grow-1">
-                                    <strong>${player.name}</strong> - ${player.position} | ${player.dob.split('-')[0]}
-                                </div>
-                                <a href="${player.document}" target="_blank" class="btn btn-secondary btn-sm me-2">Ver Doc</a>
-                                <button class="btn btn-primary btn-sm me-2" onclick="editPlayer(${index})">Editar</button>
-                                <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
-                            </div>`;
+                            <tr>
+                                <td>${player.guardian}</td>
+                                <td>${player.contact}</td>
+                                <td>${player.name}</td>
+                                <td>${player.dob}</td>
+                                <td>${player.position}</td>
+                                <td><a href="${player.document}" target="_blank" class="btn btn-secondary btn-sm">Ver Doc</a></td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="editPlayer(${index})">Editar</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
+                                </td>
+                            </tr>`;
                     }
                 });
             }
@@ -135,4 +154,5 @@
     </script>
 </body>
 </html>
+
 
