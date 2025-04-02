@@ -4,199 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Base de Jogadores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background-color: #f9f9f9; }
-        h1 { color: #333; font-weight: bold; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); display: inline-block; margin-bottom: 30px; }
-        input, button { margin: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 200px; }
-        button { background-color: #28a745; color: white; border: none; cursor: pointer; width: 220px; }
-        button:hover { background-color: #218838; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background-color: #28a745; color: white; font-weight: bold; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        tr:hover { background-color: #ddd; }
-        .favorito { background-color: #ffc107; }
-        .ranking { background-color: #17a2b8; color: white; }
-        .detalhes { color: #007bff; text-decoration: none; cursor: pointer; font-weight: bold; }
-        .filters { margin: 20px 0; display: flex; justify-content: center; gap: 20px; }
-        .filters input { padding: 10px; border-radius: 5px; width: 220px; }
-        .favorite-btn { background-color: #ffc107; color: white; cursor: pointer; border: none; }
-        .favorite-btn:hover { background-color: #e0a800; }
-        .card { background: #ffffff; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); padding: 20px; margin: 10px 0; }
-        .card-header { font-weight: bold; font-size: 1.2em; }
-        .card-body { display: flex; justify-content: space-between; align-items: center; }
-        .card-body img { width: 100px; height: 100px; border-radius: 50%; }
-        .card-body .details { flex: 1; margin-left: 15px; }
-        .card-footer { text-align: center; margin-top: 10px; }
-        .card-footer button { background-color: #007bff; color: white; }
-        .card-footer button:hover { background-color: #0056b3; }
-        .detalhes-modal { display: none; background-color: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; right: 0; bottom: 0; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 8px; max-width: 600px; width: 100%; }
+        body { background-color: #f9f9f9; }
+        .container { max-width: 900px; margin: 20px auto; }
+        .card img { width: 80px; height: 80px; border-radius: 50%; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Base de Jogadores</h1>
-
-        <!-- Filtros -->
-        <div class="filters">
-            <input type="text" id="search" placeholder="Buscar por nome" oninput="filterPlayers()">
-            <input type="text" id="filterPosition" placeholder="Filtrar por Posição" oninput="filterPlayers()">
-            <input type="number" id="filterYear" placeholder="Ano de Nascimento" oninput="filterPlayers()">
-        </div>
-
-        <!-- Formulário de Cadastro -->
-        <form id="playerForm">
-            <input type="text" id="name" placeholder="Nome" required>
-            <input type="text" id="position" placeholder="Posição" required>
-            <input type="text" id="guardian" placeholder="Nome do Responsável" required>
-            <input type="tel" id="contact" placeholder="Contato" required>
-            <input type="date" id="dob" required>
-            <input type="text" id="history" placeholder="Histórico dos Clubes" required>
-            <input type="file" id="document" accept=".pdf,.jpg,.png">
-            <button type="submit">Adicionar Jogador</button>
+        <h1 class="text-center my-4">Base de Jogadores</h1>
+        
+        <form id="playerForm" class="bg-white p-4 shadow rounded">
+            <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nome" required></div>
+            <div class="mb-3"><input type="text" id="position" class="form-control" placeholder="Posição" required></div>
+            <div class="mb-3"><input type="text" id="guardian" class="form-control" placeholder="Nome do Responsável" required></div>
+            <div class="mb-3"><input type="tel" id="contact" class="form-control" placeholder="Contato" required></div>
+            <div class="mb-3"><input type="date" id="dob" class="form-control" required></div>
+            <button type="submit" class="btn btn-success w-100">Adicionar Jogador</button>
         </form>
-
-        <!-- Lista de Jogadores -->
-        <div id="playerList">
-            <!-- Cards de Jogadores serão gerados aqui -->
-        </div>
+        
+        <div id="playerList" class="mt-4"></div>
     </div>
-
-    <!-- Modal de Detalhes -->
-    <div id="detailsModal" class="detalhes-modal">
-        <div class="modal-content">
-            <h2>Detalhes do Jogador</h2>
-            <div id="modalDetails"></div>
-            <button onclick="closeModal()">Fechar</button>
-        </div>
-    </div>
-
+    
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const playerForm = document.getElementById("playerForm");
             const playerList = document.getElementById("playerList");
-            const detailsModal = document.getElementById("detailsModal");
-            const modalDetails = document.getElementById("modalDetails");
 
-            // Função para carregar os jogadores
             function loadPlayers() {
                 const players = JSON.parse(localStorage.getItem("players")) || [];
                 playerList.innerHTML = "";
                 players.forEach((player, index) => {
-                    addPlayerToCard(player, index);
+                    playerList.innerHTML += `
+                        <div class="card mb-3 p-3">
+                            <div class="d-flex align-items-center">
+                                <img src="https://via.placeholder.com/80" alt="Jogador">
+                                <div class="ms-3 flex-grow-1">
+                                    <h5>${player.name}</h5>
+                                    <p class="mb-1"><strong>Posição:</strong> ${player.position}</p>
+                                    <p class="mb-1"><strong>Contato:</strong> ${player.contact}</p>
+                                </div>
+                                <button class="btn btn-primary btn-sm me-2" onclick="editPlayer(${index})">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
+                            </div>
+                        </div>`;
                 });
             }
 
-            // Função para salvar os jogadores no localStorage
             function savePlayers(players) {
                 localStorage.setItem("players", JSON.stringify(players));
             }
 
-            // Adicionar jogador na lista com card
-            function addPlayerToCard(player, index) {
-                let card = document.createElement("div");
-                card.classList.add("card");
-                
-                let cardHeader = document.createElement("div");
-                cardHeader.classList.add("card-header");
-                cardHeader.innerText = player.name;
-                card.appendChild(cardHeader);
-
-                let cardBody = document.createElement("div");
-                cardBody.classList.add("card-body");
-
-                let img = document.createElement("img");
-                img.src = "https://via.placeholder.com/100";  // Foto do jogador, pode ser personalizada.
-                cardBody.appendChild(img);
-
-                let details = document.createElement("div");
-                details.classList.add("details");
-                details.innerHTML = `
-                    <p><strong>Posição:</strong> ${player.position}</p>
-                    <p><strong>Responsável:</strong> ${player.guardian}</p>
-                    <p><strong>Contato:</strong> ${player.contact}</p>
-                    <p><strong>Histórico:</strong> ${player.history}</p>
-                `;
-                cardBody.appendChild(details);
-
-                let cardFooter = document.createElement("div");
-                cardFooter.classList.add("card-footer");
-                let detailsButton = document.createElement("button");
-                detailsButton.innerText = "Ver Detalhes";
-                detailsButton.onclick = function () {
-                    viewPlayerDetails(player);
-                };
-                cardFooter.appendChild(detailsButton);
-
-                card.appendChild(cardBody);
-                card.appendChild(cardFooter);
-                playerList.appendChild(card);
-            }
-
-            // Exibir detalhes do jogador em um modal
-            function viewPlayerDetails(player) {
-                modalDetails.innerHTML = `
-                    <p><strong>Nome:</strong> ${player.name}</p>
-                    <p><strong>Posição:</strong> ${player.position}</p>
-                    <p><strong>Responsável:</strong> ${player.guardian}</p>
-                    <p><strong>Contato:</strong> ${player.contact}</p>
-                    <p><strong>Histórico:</strong> ${player.history}</p>
-                    <p><strong>Data de Nascimento:</strong> ${player.dob}</p>
-                    <p><strong>Documento:</strong> <a href="${player.document}" target="_blank">Baixar Documento</a></p>
-                `;
-                detailsModal.style.display = "flex";
-            }
-
-            // Fechar o modal
-            function closeModal() {
-                detailsModal.style.display = "none";
-            }
-
-            // Função de filtro
-            function filterPlayers() {
-                let players = JSON.parse(localStorage.getItem("players")) || [];
-                let searchQuery = document.getElementById("search").value.toLowerCase();
-                let filterPosition = document.getElementById("filterPosition").value.toLowerCase();
-                let filterYear = document.getElementById("filterYear").value;
-
-                playerList.innerHTML = "";
-                players.forEach((player, index) => {
-                    if (
-                        (player.name.toLowerCase().includes(searchQuery) || !searchQuery) &&
-                        (player.position.toLowerCase().includes(filterPosition) || !filterPosition) &&
-                        (player.dob.includes(filterYear) || !filterYear)
-                    ) {
-                        addPlayerToCard(player, index);
-                    }
-                });
-            }
-
-            // Adiciona jogador no armazenamento local
             playerForm.addEventListener("submit", function (event) {
                 event.preventDefault();
-                let name = document.getElementById("name").value;
-                let position = document.getElementById("position").value;
-                let guardian = document.getElementById("guardian").value;
-                let contact = document.getElementById("contact").value;
-                let dob = document.getElementById("dob").value;
-                let history = document.getElementById("history").value;
-                let documentInput = document.getElementById("document");
-                let documentUrl = "";
-                let documentName = "";
-                if (documentInput.files.length > 0) {
-                    let file = documentInput.files[0];
-                    documentUrl = URL.createObjectURL(file);
-                    documentName = file.name;
-                }
                 let players = JSON.parse(localStorage.getItem("players")) || [];
-                players.push({ name, position, guardian, contact, dob, history, document: documentUrl, documentName });
+                const newPlayer = {
+                    name: document.getElementById("name").value,
+                    position: document.getElementById("position").value,
+                    guardian: document.getElementById("guardian").value,
+                    contact: document.getElementById("contact").value,
+                    dob: document.getElementById("dob").value
+                };
+                players.push(newPlayer);
                 savePlayers(players);
                 loadPlayers();
                 playerForm.reset();
             });
+
+            window.deletePlayer = function (index) {
+                let players = JSON.parse(localStorage.getItem("players")) || [];
+                players.splice(index, 1);
+                savePlayers(players);
+                loadPlayers();
+            };
+
+            window.editPlayer = function (index) {
+                let players = JSON.parse(localStorage.getItem("players")) || [];
+                let player = players[index];
+                document.getElementById("name").value = player.name;
+                document.getElementById("position").value = player.position;
+                document.getElementById("guardian").value = player.guardian;
+                document.getElementById("contact").value = player.contact;
+                document.getElementById("dob").value = player.dob;
+                
+                players.splice(index, 1);
+                savePlayers(players);
+                loadPlayers();
+            };
 
             loadPlayers();
         });
