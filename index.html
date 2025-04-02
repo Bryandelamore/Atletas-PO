@@ -1,158 +1,107 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base de Jogadores</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        body { background-color: #f9f9f9; }
-        .container { max-width: 900px; margin: 20px auto; }
-        .table-container { margin-top: 30px; }
-        .filter-container { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        table { border-radius: 8px; overflow: hidden; }
-        th, td { text-align: center; vertical-align: middle; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1 class="text-center my-4">Base de Jogadores</h1>
-        
-        <form id="playerForm" class="bg-white p-4 shadow rounded">
-            <h4 class="text-center mb-3">Cadastrar Jogador</h4>
-            <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nome" required></div>
-            <div class="mb-3"><input type="text" id="position" class="form-control" placeholder="Posição" required></div>
-            <div class="mb-3"><input type="text" id="guardian" class="form-control" placeholder="Nome do Responsável" required></div>
-            <div class="mb-3"><input type="tel" id="contact" class="form-control" placeholder="Contato" required></div>
-            <div class="mb-3"><input type="date" id="dob" class="form-control" required></div>
-            <div class="mb-3"><input type="file" id="document" class="form-control" accept=".pdf,.jpg,.png"></div>
-            <button type="submit" class="btn btn-success w-100">Adicionar Jogador</button>
-        </form>
-        
-        <div class="table-container">
-            <div class="filter-container mb-3">
-                <div class="row">
-                    <div class="col-md-4"><input type="text" id="search" class="form-control" placeholder="Buscar por nome"></div>
-                    <div class="col-md-3"><input type="text" id="filterPosition" class="form-control" placeholder="Filtrar por posição"></div>
-                    <div class="col-md-3"><input type="number" id="filterYear" class="form-control" placeholder="Ano de nascimento"></div>
-                    <div class="col-md-2"><button class="btn btn-primary w-100" id="filterButton">Buscar</button></div>
-                </div>
-            </div>
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Nome do Responsável</th>
-                        <th>Contato</th>
-                        <th>Nome do Atleta</th>
-                        <th>Data de Nascimento</th>
-                        <th>Posição</th>
-                        <th>Documento</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="playerList"></tbody>
-            </table>
-        </div>
-    </div>
-    
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const playerForm = document.getElementById("playerForm");
-            const playerList = document.getElementById("playerList");
-            const filterButton = document.getElementById("filterButton");
+document.addEventListener("DOMContentLoaded", function () {
+    const playerForm = document.getElementById("playerForm");
+    const playerList = document.getElementById("playerList");
+    const filterButton = document.getElementById("filterButton");
 
-            function loadPlayers(players = null) {
-                if (!players) {
-                    players = JSON.parse(localStorage.getItem("players")) || [];
-                }
-                playerList.innerHTML = "";
-                players.forEach((player, index) => {
-                    playerList.innerHTML += `
-                        <tr>
-                            <td>${player.guardian}</td>
-                            <td>${player.contact}</td>
-                            <td>${player.name}</td>
-                            <td>${player.dob}</td>
-                            <td>${player.position}</td>
-                            <td><a href="${player.document}" target="_blank" class="btn btn-secondary btn-sm">Ver Doc</a></td>
-                            <td>
-                                <button class="btn btn-primary btn-sm" onclick="editPlayer(${index})">Editar</button>
-                                <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
-                            </td>
-                        </tr>`;
-                });
-            }
-
-            function savePlayers(players) {
-                localStorage.setItem("players", JSON.stringify(players));
-            }
-
-            function filterPlayers() {
-                let players = JSON.parse(localStorage.getItem("players")) || [];
-                let searchQuery = document.getElementById("search").value.toLowerCase();
-                let filterPosition = document.getElementById("filterPosition").value.toLowerCase();
-                let filterYear = document.getElementById("filterYear").value;
-                
-                let filteredPlayers = players.filter(player => {
-                    let matchName = !searchQuery || player.name.toLowerCase().includes(searchQuery);
-                    let matchPosition = !filterPosition || player.position.toLowerCase().includes(filterPosition);
-                    let matchYear = !filterYear || player.dob.startsWith(filterYear);
-                    return matchName && matchPosition && matchYear;
-                });
-                loadPlayers(filteredPlayers);
-            }
-
-            filterButton.addEventListener("click", filterPlayers);
-
-            document.getElementById("playerForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
-    
-    let documentInput = document.getElementById("document");
-    let documentUrl = "";
-    
-    if (documentInput.files.length > 0) {
-        let file = documentInput.files[0];
-        let formData = new FormData();
+    async function uploadFile(file) {
+        const formData = new FormData();
         formData.append("file", file);
-        formData.append(dpy5fezpf, 483485417816251); // Configurar no Cloudinary
-        
+        formData.append("upload_preset", meu_presetpo); // Substitua pelo seu Upload Preset
+
         try {
-            let response = await fetch("https://api.cloudinary.com/v1_1/SEU_CLOUD_NAME/upload", {
+            let response = await fetch("https://api.cloudinary.com/v1_1/dpy5fezpf/upload", {
                 method: "POST",
                 body: formData
             });
             let data = await response.json();
-            documentUrl = data.secure_url; // Link do arquivo armazenado no Cloudinary
+            return data.secure_url; // Retorna a URL do arquivo no Cloudinary
         } catch (error) {
             console.error("Erro ao enviar arquivo:", error);
             alert("Erro ao enviar o documento!");
-            return;
+            return null;
         }
     }
 
-    const newPlayer = {
-        name: document.getElementById("name").value,
-        position: document.getElementById("position").value,
-        guardian: document.getElementById("guardian").value,
-        contact: document.getElementById("contact").value,
-        dob: document.getElementById("dob").value,
-        document: documentUrl
-    };
+    async function handleFormSubmit(event) {
+        event.preventDefault();
 
-    // Aqui você pode salvar no Firebase Firestore ou localStorage
-    let players = JSON.parse(localStorage.getItem("players")) || [];
-    players.push(newPlayer);
-    localStorage.setItem("players", JSON.stringify(players));
+        let documentInput = document.getElementById("document");
+        let documentUrl = "";
 
-    alert("Jogador cadastrado com sucesso!");
-    document.getElementById("playerForm").reset();
+        if (documentInput.files.length > 0) {
+            let file = documentInput.files[0];
+            documentUrl = await uploadFile(file);
+            if (!documentUrl) return; // Se deu erro no upload, interrompe o processo
+        }
+
+        const newPlayer = {
+            name: document.getElementById("name").value,
+            position: document.getElementById("position").value,
+            guardian: document.getElementById("guardian").value,
+            contact: document.getElementById("contact").value,
+            dob: document.getElementById("dob").value,
+            document: documentUrl
+        };
+
+        let players = JSON.parse(localStorage.getItem("players")) || [];
+        players.push(newPlayer);
+        localStorage.setItem("players", JSON.stringify(players));
+
+        alert("Jogador cadastrado com sucesso!");
+        playerForm.reset();
+        loadPlayers();
+    }
+
+    function loadPlayers(players = null) {
+        if (!players) {
+            players = JSON.parse(localStorage.getItem("players")) || [];
+        }
+        playerList.innerHTML = "";
+        players.forEach((player, index) => {
+            playerList.innerHTML += `
+                <tr>
+                    <td>${player.guardian}</td>
+                    <td>${player.contact}</td>
+                    <td>${player.name}</td>
+                    <td>${player.dob}</td>
+                    <td>${player.position}</td>
+                    <td>
+                        ${player.document ? `<a href="${player.document}" target="_blank" class="btn btn-secondary btn-sm">Ver Doc</a>` : "Nenhum documento"}
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    function deletePlayer(index) {
+        let players = JSON.parse(localStorage.getItem("players")) || [];
+        players.splice(index, 1);
+        localStorage.setItem("players", JSON.stringify(players));
+        loadPlayers();
+    }
+
+    function filterPlayers() {
+        let players = JSON.parse(localStorage.getItem("players")) || [];
+        let searchQuery = document.getElementById("search").value.toLowerCase();
+        let filterPosition = document.getElementById("filterPosition").value.toLowerCase();
+        let filterYear = document.getElementById("filterYear").value;
+
+        let filteredPlayers = players.filter(player => {
+            let matchName = !searchQuery || player.name.toLowerCase().includes(searchQuery);
+            let matchPosition = !filterPosition || player.position.toLowerCase().includes(filterPosition);
+            let matchYear = !filterYear || player.dob.startsWith(filterYear);
+            return matchName && matchPosition && matchYear;
+        });
+
+        loadPlayers(filteredPlayers);
+    }
+
+    filterButton.addEventListener("click", filterPlayers);
+    playerForm.addEventListener("submit", handleFormSubmit);
+
     loadPlayers();
 });
 
-            loadPlayers();
-        });
-    </script>
-</body>
-</html>
 
