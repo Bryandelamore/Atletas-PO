@@ -9,12 +9,18 @@
     <style>
         body { background-color: #f9f9f9; }
         .container { max-width: 900px; margin: 20px auto; }
-        .card img { width: 80px; height: 80px; border-radius: 50%; }
+        .card img { width: 50px; height: 50px; border-radius: 50%; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="text-center my-4">Base de Jogadores</h1>
+        
+        <div class="row mb-3">
+            <div class="col-md-6"><input type="text" id="search" class="form-control" placeholder="Buscar por nome" oninput="filterPlayers()"></div>
+            <div class="col-md-3"><input type="text" id="filterPosition" class="form-control" placeholder="Filtrar por posição" oninput="filterPlayers()"></div>
+            <div class="col-md-3"><input type="number" id="filterYear" class="form-control" placeholder="Ano de nascimento" oninput="filterPlayers()"></div>
+        </div>
         
         <form id="playerForm" class="bg-white p-4 shadow rounded">
             <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nome" required></div>
@@ -22,6 +28,7 @@
             <div class="mb-3"><input type="text" id="guardian" class="form-control" placeholder="Nome do Responsável" required></div>
             <div class="mb-3"><input type="tel" id="contact" class="form-control" placeholder="Contato" required></div>
             <div class="mb-3"><input type="date" id="dob" class="form-control" required></div>
+            <div class="mb-3"><input type="file" id="document" class="form-control" accept=".pdf,.jpg,.png"></div>
             <button type="submit" class="btn btn-success w-100">Adicionar Jogador</button>
         </form>
         
@@ -38,17 +45,14 @@
                 playerList.innerHTML = "";
                 players.forEach((player, index) => {
                     playerList.innerHTML += `
-                        <div class="card mb-3 p-3">
-                            <div class="d-flex align-items-center">
-                                <img src="https://via.placeholder.com/80" alt="Jogador">
-                                <div class="ms-3 flex-grow-1">
-                                    <h5>${player.name}</h5>
-                                    <p class="mb-1"><strong>Posição:</strong> ${player.position}</p>
-                                    <p class="mb-1"><strong>Contato:</strong> ${player.contact}</p>
-                                </div>
-                                <button class="btn btn-primary btn-sm me-2" onclick="editPlayer(${index})">Editar</button>
-                                <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
+                        <div class="d-flex align-items-center border p-2 mb-2 bg-white shadow-sm">
+                            <img src="https://via.placeholder.com/50" alt="Jogador">
+                            <div class="ms-3 flex-grow-1">
+                                <strong>${player.name}</strong> - ${player.position} | ${player.dob.split('-')[0]}
                             </div>
+                            <a href="${player.document}" target="_blank" class="btn btn-secondary btn-sm me-2">Ver Doc</a>
+                            <button class="btn btn-primary btn-sm me-2" onclick="editPlayer(${index})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
                         </div>`;
                 });
             }
@@ -57,15 +61,48 @@
                 localStorage.setItem("players", JSON.stringify(players));
             }
 
+            function filterPlayers() {
+                let players = JSON.parse(localStorage.getItem("players")) || [];
+                let searchQuery = document.getElementById("search").value.toLowerCase();
+                let filterPosition = document.getElementById("filterPosition").value.toLowerCase();
+                let filterYear = document.getElementById("filterYear").value;
+                playerList.innerHTML = "";
+                players.forEach((player, index) => {
+                    if (
+                        (player.name.toLowerCase().includes(searchQuery) || !searchQuery) &&
+                        (player.position.toLowerCase().includes(filterPosition) || !filterPosition) &&
+                        (player.dob.includes(filterYear) || !filterYear)
+                    ) {
+                        playerList.innerHTML += `
+                            <div class="d-flex align-items-center border p-2 mb-2 bg-white shadow-sm">
+                                <img src="https://via.placeholder.com/50" alt="Jogador">
+                                <div class="ms-3 flex-grow-1">
+                                    <strong>${player.name}</strong> - ${player.position} | ${player.dob.split('-')[0]}
+                                </div>
+                                <a href="${player.document}" target="_blank" class="btn btn-secondary btn-sm me-2">Ver Doc</a>
+                                <button class="btn btn-primary btn-sm me-2" onclick="editPlayer(${index})">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">Excluir</button>
+                            </div>`;
+                    }
+                });
+            }
+
             playerForm.addEventListener("submit", function (event) {
                 event.preventDefault();
                 let players = JSON.parse(localStorage.getItem("players")) || [];
+                let documentInput = document.getElementById("document");
+                let documentUrl = "";
+                if (documentInput.files.length > 0) {
+                    let file = documentInput.files[0];
+                    documentUrl = URL.createObjectURL(file);
+                }
                 const newPlayer = {
                     name: document.getElementById("name").value,
                     position: document.getElementById("position").value,
                     guardian: document.getElementById("guardian").value,
                     contact: document.getElementById("contact").value,
-                    dob: document.getElementById("dob").value
+                    dob: document.getElementById("dob").value,
+                    document: documentUrl
                 };
                 players.push(newPlayer);
                 savePlayers(players);
@@ -88,7 +125,6 @@
                 document.getElementById("guardian").value = player.guardian;
                 document.getElementById("contact").value = player.contact;
                 document.getElementById("dob").value = player.dob;
-                
                 players.splice(index, 1);
                 savePlayers(players);
                 loadPlayers();
