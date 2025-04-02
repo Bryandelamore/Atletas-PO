@@ -9,6 +9,10 @@
     <style>
         body { background-color: #f9f9f9; }
         .container { max-width: 900px; margin: 20px auto; }
+        .table-container { margin-top: 30px; }
+        .filter-container { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        table { border-radius: 8px; overflow: hidden; }
+        th, td { text-align: center; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -16,6 +20,7 @@
         <h1 class="text-center my-4">Base de Jogadores</h1>
         
         <form id="playerForm" class="bg-white p-4 shadow rounded">
+            <h4 class="text-center mb-3">Cadastrar Jogador</h4>
             <div class="mb-3"><input type="text" id="name" class="form-control" placeholder="Nome" required></div>
             <div class="mb-3"><input type="text" id="position" class="form-control" placeholder="Posição" required></div>
             <div class="mb-3"><input type="text" id="guardian" class="form-control" placeholder="Nome do Responsável" required></div>
@@ -25,27 +30,30 @@
             <button type="submit" class="btn btn-success w-100">Adicionar Jogador</button>
         </form>
         
-        <div class="row mt-4">
-            <div class="col-md-4"><input type="text" id="search" class="form-control" placeholder="Buscar por nome"></div>
-            <div class="col-md-3"><input type="text" id="filterPosition" class="form-control" placeholder="Filtrar por posição"></div>
-            <div class="col-md-3"><input type="number" id="filterYear" class="form-control" placeholder="Ano de nascimento"></div>
-            <div class="col-md-2"><button class="btn btn-primary w-100" id="filterButton">Buscar</button></div>
+        <div class="table-container">
+            <div class="filter-container mb-3">
+                <div class="row">
+                    <div class="col-md-4"><input type="text" id="search" class="form-control" placeholder="Buscar por nome"></div>
+                    <div class="col-md-3"><input type="text" id="filterPosition" class="form-control" placeholder="Filtrar por posição"></div>
+                    <div class="col-md-3"><input type="number" id="filterYear" class="form-control" placeholder="Ano de nascimento"></div>
+                    <div class="col-md-2"><button class="btn btn-primary w-100" id="filterButton">Buscar</button></div>
+                </div>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nome do Responsável</th>
+                        <th>Contato</th>
+                        <th>Nome do Atleta</th>
+                        <th>Data de Nascimento</th>
+                        <th>Posição</th>
+                        <th>Documento</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="playerList"></tbody>
+            </table>
         </div>
-
-        <table class="table table-striped mt-4">
-            <thead>
-                <tr>
-                    <th>Nome do Responsável</th>
-                    <th>Contato</th>
-                    <th>Nome do Atleta</th>
-                    <th>Data de Nascimento</th>
-                    <th>Posição</th>
-                    <th>Documento</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="playerList"></tbody>
-        </table>
     </div>
     
     <script>
@@ -119,27 +127,6 @@
                 loadPlayers();
                 playerForm.reset();
             });
-
-            window.deletePlayer = function (index) {
-                let players = JSON.parse(localStorage.getItem("players")) || [];
-                players.splice(index, 1);
-                savePlayers(players);
-                loadPlayers();
-            };
-
-            window.editPlayer = function (index) {
-                let players = JSON.parse(localStorage.getItem("players")) || [];
-                let player = players[index];
-                document.getElementById("name").value = player.name;
-                document.getElementById("position").value = player.position;
-                document.getElementById("guardian").value = player.guardian;
-                document.getElementById("contact").value = player.contact;
-                document.getElementById("dob").value = player.dob;
-                players.splice(index, 1);
-                savePlayers(players);
-                loadPlayers();
-            };
-
             loadPlayers();
         });
     </script>
